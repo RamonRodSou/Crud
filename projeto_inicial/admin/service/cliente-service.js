@@ -1,54 +1,48 @@
-const criaNovaLinha = (nome, email) => {
 
-    const linhaNovoCliente = document.createElement('tr')
-    const conteudo = `
+//const listaClientes = () => {
+    // const promise = new Promise ((resolve, reject) => {
+    //     const http = new XMLHttpRequest();   // Faz a Comunicação
+    //     http.open('GET', 'http://localhost:3000/profile');   // abre a comunicação da aplicação com a API
+    //     http.onload = () => {   // Indicando pro JS oque irá acontecer depois que ele enviar a requisição  metodo "onload" ao carregar a página, vai executar alguma coisa. 
+    //         if( http.status >= 400){
+    //             reject(JSON.parse(http.response));  // transformando essa "response" que vem em texto em um objeto JavaScript
+    //         }else {
+    //             resolve(JSON.parse(http.response));
+    //         }
+    //     }
+    //     http.send();
+    // })
+    // return promise;
+//}
 
-        <td class="td" data-td>${nome}</td>
-            <td>${email}</td>
-            <td>
-                <ul class="tabela__botoes-controle">
-                    <li><a href="../telas/edita_cliente.html" class="botao-simples botao-simples--editar">Editar</a></li>
-                    <li><button class="botao-simples botao-simples--excluir" type="button">Excluir</button></li>
-                </ul>
-            </td>
-    
-    `
+// Outro jeito de fazer requisições
+// Reduzindo esse código usando a "fetch api"
+// por padrão a  fetch já faz um "GET" e devolve uma " Promese"
 
-    linhaNovoCliente.innerHTML = conteudo
-    return linhaNovoCliente
-}
-
-const tabela = document.querySelector('[data-tabela]')
 
 const listaClientes = () => {
-
-    const promise = new Promise ((resolve, reject) => {
-            
-        const http = new XMLHttpRequest();   // Faz a Comunicação
-        http.open('GET', 'http://localhost:3000/profile');   // abre a comunicação da aplicação com a API
-
-        http.onload = () => {   // Indicando pro JS oque irá acontecer depois que ele enviar a requisição  metodo "onload" ao carregar a página, vai executar alguma coisa. 
-            if( http.status >= 400){
-                reject(JSON.parse(http.response));  // transformando essa "response" que vem em texto em um objeto JavaScript
-
-            }else {
-
-                resolve(JSON.parse(http.response));
-            }
-        }
-        http.send();
-
+    return fetch('http://localhost:3000/profile')
+    .then ( resposta => {
+        return resposta.json(); // Pegando a Resposta, transformnando em um JavaScript válido e retornando
     })
-    
-    return promise;
+}
+const criaCliente = (nome, email) => {
+    return fetch('http://localhost:3000/profile', {
+        method: 'POST',   // Uma postagem normal, a gente escreve e mandando pro servidor, e dps aparece na timelime
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify ({  // Passa um método JS para texto
+            nome: nome,
+            email: email
+        })
+    })
+    .then(resposta =>{
+        return resposta.body
+    })
 }
 
-listaClientes()
-// Depois de executar a função listaCliente e pegar a promesa ele vai exibiti isso na tela.
-.then (data => {  // "então" 
+export const clienteService = {
 
-    data.forEach(element => {
-        tabela.appendChild(criaNovaLinha(element.nome, element.email))// colocando o elemento filho que  seria a tabela " TR"  dentro do elemento pai " data-tabela"
-
-    })
-})
+    listaClientes, criaCliente
+}
