@@ -1,30 +1,13 @@
-
-//const listaClientes = () => {
-    // const promise = new Promise ((resolve, reject) => {
-    //     const http = new XMLHttpRequest();   // Faz a Comunicação
-    //     http.open('GET', 'http://localhost:3000/profile');   // abre a comunicação da aplicação com a API
-    //     http.onload = () => {   // Indicando pro JS oque irá acontecer depois que ele enviar a requisição  metodo "onload" ao carregar a página, vai executar alguma coisa. 
-    //         if( http.status >= 400){
-    //             reject(JSON.parse(http.response));  // transformando essa "response" que vem em texto em um objeto JavaScript
-    //         }else {
-    //             resolve(JSON.parse(http.response));
-    //         }
-    //     }
-    //     http.send();
-    // })
-    // return promise;
-//}
-
-// Outro jeito de fazer requisições
-// Reduzindo esse código usando a "fetch api"
-// por padrão a  fetch já faz um "GET" e devolve uma " Promese"
-
-
 const listaClientes = () => {
     return fetch('http://localhost:3000/profile')
     .then ( resposta => {
-        return resposta.json() // Pegando a Resposta, transformnando em um JavaScript válido e retornando
+        if (resposta.ok){
+            return resposta.json() // Pegando a Resposta, transformnando em um JavaScript válido e retornando
+        }
+        throw new Error ('Não foi possivel listar os clientes')
     })
+
+
 }
 const criaCliente = (nome, email) => {
     return fetch('http://localhost:3000/profile', {
@@ -38,20 +21,31 @@ const criaCliente = (nome, email) => {
         })
     })
     .then(resposta =>{
-        return resposta.body
+        if (resposta.ok){
+            return resposta.body
+        }
+        throw new Error ('Não foi possivel criar um clientes')
     })
 }
 
 const removeCliente = (id) => {
     return fetch(`http://localhost:3000/profile/${id}`, {
         method: "DELETE",
-    })
+    }).then ( resposta => {
+        if (!resposta.ok){
+            throw new Error ('Não foi possivel remover um clientes')
+            }
+        })
+    
 }
 
 const detalhaCliente = (id) => {
     return fetch(`http://localhost:3000/profile/${id}`)
     .then ( resposta => {
-        return resposta.json() // Pegando a Resposta, transformnando em um JavaScript válido e retornando
+        if (resposta.ok){
+            return resposta.json() // Pegando a Resposta, transformnando em um JavaScript válido e retornando
+        }
+        throw new Error ('Não foi possivel detalhar clientes')
     })
 }
 
@@ -67,7 +61,10 @@ const atualizaCliente = (id, nome, email) => {
         })
     })
     .then( resposta => {
-        return resposta.json()
+        if (resposta.ok){
+            return resposta.json() // Pegando a Resposta, transformnando em um JavaScript válido e retornando
+        }
+        throw new Error ('Não foi possivel atualizar um clientes')
     })
 }
 

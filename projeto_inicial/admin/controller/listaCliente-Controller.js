@@ -16,29 +16,39 @@ const criaNovaLinha = (nome, email, id) => {
 
     linhaNovoCliente.innerHTML = conteudo
     linhaNovoCliente.dataset.id = id
-    console.log(linhaNovoCliente)
     return linhaNovoCliente
 }
 
 const tabela = document.querySelector('[data-tabela]')
 
-tabela.addEventListener('click', (evento)=> {
+tabela.addEventListener('click', async(evento)=> {
 
     let ehBotaoDeletar = evento.target.className === 'botao-simples botao-simples--excluir'
-
     if(ehBotaoDeletar){
-        const linhaCliente = evento.target.closest('[data-id]') // mais proximo da data-id
-        let id = linhaCliente.dataset.id
-        clienteService.removeCliente(id)
-        .then (()=>{
-            linhaCliente.remove()
-        })
+        try { // Vai tentar executar esse código
+            const linhaCliente = evento.target.closest('[data-id]') // mais proximo da data-id
+            let id = linhaCliente.dataset.id
+            await clienteService.removeCliente(id)
+        }
+        catch (erro){ // caso não consiga. vai ser direcionado para tela de erro
+            console.log(erro)
+            window.location.href = '../telas/erro.html'
+        }
     }
 })
 
-clienteService.listaClientes()  // Depois de executar a função listaCliente e pegar a promesa ele vai exibiti isso na tela.
-.then(data => {  // "então" 
-    data.forEach(elemento => {
-    tabela.appendChild(criaNovaLinha(elemento.nome, elemento.email, elemento.id))// colocando o elemento filho que  seria a tabela " TR"  dentro do elemento pai " data-tabela"
-})
-})
+
+const render = async() => {
+    try {
+        const listaClientes = await clienteService.listaClientes()  // Depois de executar a função listaCliente e pegar a promesa ele vai exibiti isso na tela.
+        listaClientes.forEach(elemento => {
+            tabela.appendChild(criaNovaLinha(elemento.nome, elemento.email, elemento.id))// colocando o elemento filho que  seria a tabela " TR"  dentro do elemento pai " data-tabela"
+        })
+    }
+    catch (erro){ // caso não consiga. vai ser direcionado para tela de erro
+        console.log(erro)
+        window.location.href = '../telas/erro.html'
+    }
+}
+
+render()
